@@ -1,3 +1,3 @@
 # DotStar Matrix Examples
 
-Test commit
+Code based off of Examples found in Adafruit Libraries for DotStar Matrix
