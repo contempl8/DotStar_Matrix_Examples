@@ -1,5 +1,3 @@
-// Adafruit_DotStarMatrix example for single DotStar LED matrix.
-
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
@@ -15,9 +13,7 @@
 #define DATAPIN    11
 #define CLOCKPIN   13
 
-
-#define SHIFTDELAY 80
-#define BRIGHTNESS 40
+#define BRIGHTNESS 50
 
 // MATRIX DECLARATION:
 // Parameter 1 = width of DotStar matrix
@@ -65,52 +61,55 @@ const uint16_t adaColors[] = {
   matrix.Color(255, 220, 0)  //! orange/yellow
 };
 
-char string4print[] = "I LOVE YOU!";
-//char string4print[] = "MARICILLE ROCKS";
-
+char adafruit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//char adafruit[] = "I LOVE YOU!";
+//char adafruit[] = "maricille rocks";
+int sensorPin = A0;    // select the input pin for the potentiometer
+int ledPin = 13;      // select the pin for the LED
+int sensorValue = 0;  // variable to store the value coming from the sensor
 
 void setup() {
   Serial.begin(115200);
  
   // uncomment to have wait
-  while (!Serial) delay(500); 
+  //while (!Serial) delay(500); 
 
   Serial.println("\nDotstar Matrix Wing");
-  Serial.println(DATAPIN);
-  Serial.println(CLOCKPIN);
   matrix.begin();
   matrix.setFont(&TomThumb);
   matrix.setTextWrap(false);
   matrix.setBrightness(BRIGHTNESS);
 
-  for (byte i = 0; i < 3; i++) {
-    matrix.fillScreen(primaryColors[i]);
-    matrix.show();
-    delay(750);
-  }
+//  for (byte i = 0; i < 3; i++) {
+//    matrix.fillScreen(primaryColors[i]);
+//    matrix.show();
+//    delay(750);
+//  }
 }
 
-int x = matrix.width()-5;
-int pass = 0;
+int x = matrix.width();
+
 
 void loop() {
+    sensorValue = analogRead(sensorPin);
+    x = 4*sizeof(adafruit)*((float)sensorValue/(float)1023)-matrix.width(); //letters were 4 dots wide including single space
+  int pass = 0;
   matrix.fillScreen(0);
-  matrix.setCursor(x, 5); // Sets location of letters when printing
-  for (byte i = 0; i < strlen(string4print); i++) {
+  matrix.setCursor(-x, 5);
+  for (byte i = 0; i < strlen(adafruit); i++) {
     // set the color
-    matrix.setTextColor(adaColors[i]);
+
+    matrix.setTextColor(primaryColors[pass]);
+    if(++pass == 3){ //Handles the color scheme
+      pass = 0;
+    }
     // write the letter
-    matrix.print(string4print[i]);
-//    Serial.println(String(i));
-//    Serial.println(adaColors[i]);
-    Serial.println(string4print[i]);
-//    delay(200);
+    matrix.print(adafruit[i]);
   }
-Serial.println("X value");
-Serial.println(x);
-  if (--x < -50) { 
-    x = matrix.width()-5; //Start cursor at beginning
-  }
+
+//  if (--x < -50) {
+//    x = matrix.width();
+//  }
 
   matrix.show();
   delay(SHIFTDELAY);
